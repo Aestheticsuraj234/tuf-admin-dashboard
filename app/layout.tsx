@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import {Plus_Jakarta_Sans} from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
  
 
 const jakarta = Plus_Jakarta_Sans({subsets:["latin"]})
@@ -35,6 +36,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
         {children}
+        <Toaster />
         </ThemeProvider>
       </body>
     </html>

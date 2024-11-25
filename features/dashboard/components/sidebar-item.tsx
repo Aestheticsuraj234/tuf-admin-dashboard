@@ -11,6 +11,9 @@ const SidebarItem = ({ href, icon: Icon, label }: SidebarItemProps) => {
     const isActive = (pathname === "/" && href === "/") ||
     pathname === href || pathname?.startsWith(`${href}/`)
 
+    const onRoute = ()=>{
+      router.push(href)
+    }
   return (
     <>
       <button
@@ -18,6 +21,7 @@ const SidebarItem = ({ href, icon: Icon, label }: SidebarItemProps) => {
           "flex items-center gap-x-2 text-slate-500 dark:text-slate-100 text-sm font-[500] pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20",
           isActive && "text-zinc-700 bg-red-200/20 hover:bg-red-200/20 hover:text-zinc-700"
         )}
+        onClick={onRoute}
       >
         <div className="flex items-center gap-x-2 py-4">
           <Icon

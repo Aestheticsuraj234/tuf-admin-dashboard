@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/auth";
 import { db } from "@/lib/db/db";
 
 
@@ -28,4 +29,9 @@ export const getAccountByUserId = async (userId:string)=>{
         console.log(error)
         return null
     }
+}
+
+export const currentUser = async()=>{
+    const user = await auth()
+    return user?.user;
 }
