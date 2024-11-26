@@ -22,6 +22,8 @@ model User{
   accounts Account[]
   role   UserRole   @default(USER)
 
+  contents     Content[]
+
   createdAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -45,4 +47,31 @@ model Account {
 
   @@unique([provider, providerAccountId])
   @@index([userId]) 
+}
+
+enum ContentType {
+DSA
+BLOGS
+CS_SUBJECTS
+SYSTEM_DESIGN
+RESOURCES
+}
+
+enum ContentStatus {
+  UNPUBLISHED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Content{
+  id  String @id @default(cuid())  @map("_id")
+  title String
+  description String
+  image String
+  type   ContentType
+  status  ContentStatus    @default(UNPUBLISHED)
+  author  User    @relation(fields: [authorId] , references: [id] , onDelete:Cascade)
+  authorId   String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime   @updatedAt
 }
