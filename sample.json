@@ -1,0 +1,29 @@
+{
+    "title": "Array Basics",
+    "description": "Learn the fundamentals of arrays in DSA.",
+    "dsaSteps": [
+      {
+        "stepNumber": 1,
+        "stepTitle": "Introduction to Arrays",
+        "status": "ARCHIVED",
+        "dsaChapters": [
+          {
+            "chapterNumber": 1,
+            "chapterTitle": "What are Arrays?",
+            "status": "ARCHIVED",
+            "problems": [
+              {
+                "problemTitle": "Array Basics Problem",
+                "articleLink": "https://example.com/article",
+                "youtubeLink": "https://youtube.com/example",
+                "problemLink": "https://example.com/practice",
+                "difficultyLevel": "EASY",
+                "status": "ARCHIVED"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  

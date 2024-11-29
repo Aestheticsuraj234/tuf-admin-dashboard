@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,47 +13,49 @@ enum UserRole {
   PREMIUM_USER
 }
 
-model User{
-  id  String @id @default(cuid())  @map("_id")
-  name String?
-  email String @unique
-  image String?
+model User {
+  id       String    @id @default(cuid()) @map("_id")
+  name     String?
+  email    String    @unique
+  image    String?
   accounts Account[]
-  role   UserRole   @default(USER)
+  role     UserRole  @default(USER)
 
-  contents     Content[]
+  contents Content[]
+  problemSolved   ProblemSolved[]
+  problemMarked    ProblemMarked[]
+  problemNotes     Note[]
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
 model Account {
-  id                 String  @id @default(cuid()) @map("_id")
-  userId             String  @map("user_id")
-  type               String
-  provider           String
-  providerAccountId  String
-  refreshToken       String? @map("refresh_token")
-  accessToken        String? @map("access_token")
-  expiresAt          Int?    @map("expires_at")
-  tokenType          String? @map("token_type")
-  scope              String?
-  idToken            String? @map("id_token")
-  sessionState       String? @map("session_state")
+  id                String  @id @default(cuid()) @map("_id")
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String
+  refreshToken      String? @map("refresh_token")
+  accessToken       String? @map("access_token")
+  expiresAt         Int?    @map("expires_at")
+  tokenType         String? @map("token_type")
+  scope             String?
+  idToken           String? @map("id_token")
+  sessionState      String? @map("session_state")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@index([userId]) 
+  @@index([userId])
 }
 
 enum ContentType {
-DSA
-BLOGS
-CS_SUBJECTS
-SYSTEM_DESIGN
-RESOURCES
+  DSA
+  BLOGS
+  CS_SUBJECTS
+  SYSTEM_DESIGN
+  RESOURCES
 }
 
 enum ContentStatus {
@@ -63,15 +64,110 @@ enum ContentStatus {
   ARCHIVED
 }
 
-model Content{
-  id  String @id @default(cuid())  @map("_id")
-  title String
+model Content {
+  id          String        @id @default(cuid()) @map("_id")
+  title       String
   description String
-  image String
-  type   ContentType
-  status  ContentStatus    @default(UNPUBLISHED)
-  author  User    @relation(fields: [authorId] , references: [id] , onDelete:Cascade)
-  authorId   String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime   @updatedAt
+  image       String
+  type        ContentType
+  status      ContentStatus @default(UNPUBLISHED)
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  dsa         Dsa[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Dsa {
+  id          String        @id @default(cuid()) @map("_id")
+  content     Content       @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId   String
+  title       String
+  description String
+  dsaSteps    DsaStep[]
+  status      ContentStatus @default(UNPUBLISHED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model DsaStep {
+  id          String        @id @default(cuid()) @map("_id")
+  dsa         Dsa           @relation(fields: [dsaId], references: [id])
+  dsaId       String
+  stepNumber  Int
+  stepTitle   String
+  dsaChapters DsaChapter[]
+  status      ContentStatus @default(UNPUBLISHED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model DsaChapter {
+  id            String        @id @default(cuid()) @map("_id")
+  dsaStep       DsaStep       @relation(fields: [dsaStepId], references: [id])
+  dsaStepId     String
+  chapterNumber Int
+  chapterTitle  String
+  problems      Problem[]
+  status        ContentStatus @default(UNPUBLISHED)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Problem {
+  id              String          @id @default(cuid()) @map("_id")
+  dsaChapter      DsaChapter      @relation(fields: [dsaChapterId], references: [id])
+  dsaChapterId    String
+  title           String
+  articleLink     String?
+  videoLink       String?
+  practiceLink    String?
+  difficultyLevel DifficultyLevel @default(EASY)
+  status          ContentStatus   @default(UNPUBLISHED)
+  solvedBy        ProblemSolved[]
+  markedBy        ProblemMarked[]
+  notes           Note[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model ProblemSolved {
+  id        String  @id @default(cuid()) @map("_id")
+  userId    String
+  problemId String
+  isSolved  Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
+model ProblemMarked {
+  id        String  @id @default(cuid()) @map("_id")
+  userId    String
+  problemId String
+  isMarked  Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
+
+
+model Note {
+  id        String  @id @default(cuid()) @map("_id")
+  userId    String
+  problemId String
+  note     String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
 }
