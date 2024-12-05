@@ -1,31 +1,48 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import Hint from "@/components/shared/hint";
 import { ContentStatus, DifficultyLevel } from "@prisma/client";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Hint from "@/components/shared/hint";
 
-const DsaContentFields = () => {
+interface FormData {
+  data: {
+    title: string;
+    description: string;
+    status: ContentStatus;
+    dsaSteps: Array<{
+      stepNumber: number;
+      stepTitle: string;
+      status: ContentStatus;
+      dsaChapters: Array<{
+        chapterNumber: number;
+        chapterTitle: string;
+        problems: Array<{
+          problemTitle: string;
+          difficultyLevel: DifficultyLevel;
+          status: ContentStatus;
+          youtubeLink: string;
+          problemLink: string;
+          articleLink: string;
+        }>;
+      }>;
+    }>;
+  };
+}
+
+const UpdateDsaContentFields: React.FC<FormData> = ({data:formData }) => {
   const { control, getValues, setValue, watch } = useFormContext();
   const {
     fields: steps,
@@ -35,6 +52,22 @@ const DsaContentFields = () => {
     control,
     name: "dsaSteps",
   });
+
+  useEffect(() => {
+    if (formData?.dsaSteps?.length > 0) {
+      // Populate steps only if they exist in formData
+      formData.dsaSteps.forEach((step) => {
+        appendStep({
+          stepNumber: step.stepNumber,
+          stepTitle: step.stepTitle,
+          status: step.status,
+          dsaChapters: step.dsaChapters || [],
+        });
+      });
+    }
+  }, [formData, appendStep]);
+
+
 
   const addStep = () => {
     appendStep({
@@ -100,6 +133,12 @@ const DsaContentFields = () => {
     );
   };
 
+  useEffect(() => {
+    setValue("title", formData?.title || "");
+    setValue("description", formData?.description || "");
+    setValue("status", formData?.status || ContentStatus.ARCHIVED);
+  }, [formData, setValue]);
+
   return (
     <div className="space-y-6 p-4">
       <FormField
@@ -142,6 +181,7 @@ const DsaContentFields = () => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select the Status" />
@@ -526,5 +566,5 @@ const DsaContentFields = () => {
   );
 };
 
-export default DsaContentFields;
+export default UpdateDsaContentFields;
 

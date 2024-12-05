@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import {Plus_Jakarta_Sans} from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import React from "react";
  
 
 const jakarta = Plus_Jakarta_Sans({subsets:["latin"]})
@@ -29,6 +30,7 @@ export default async function RootLayout({
       <body
        className={jakarta.className}
       >
+        <React.StrictMode>
          <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -38,6 +40,7 @@ export default async function RootLayout({
         {children}
         <Toaster />
         </ThemeProvider>
+        </React.StrictMode>
       </body>
     </html>
     </SessionProvider>

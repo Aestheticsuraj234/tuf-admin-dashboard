@@ -4,6 +4,7 @@ import { create_dsa } from '@/features/content-management/dsa/actions'
 import DsaContentFields from '@/features/content-management/dsa/components/dsa-content-fields'
 import { DsaContentSchema } from '@/features/content-management/dsa/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ContentStatus } from '@prisma/client'
 import React, { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -18,6 +19,7 @@ const DsaAddForm = () => {
             title:"",
             description:"",
             dsaSteps:[],
+            status:ContentStatus.UNPUBLISHED
         }
     })
 
