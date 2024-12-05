@@ -92,7 +92,7 @@ model Dsa {
 
 model DsaStep {
   id          String        @id @default(cuid()) @map("_id")
-  dsa         Dsa           @relation(fields: [dsaId], references: [id])
+  dsa         Dsa           @relation(fields: [dsaId], references: [id] ,  onDelete: Cascade)
   dsaId       String
   stepNumber  Int
   stepTitle   String
@@ -104,7 +104,7 @@ model DsaStep {
 
 model DsaChapter {
   id            String        @id @default(cuid()) @map("_id")
-  dsaStep       DsaStep       @relation(fields: [dsaStepId], references: [id])
+  dsaStep       DsaStep       @relation(fields: [dsaStepId], references: [id] ,  onDelete: Cascade)
   dsaStepId     String
   chapterNumber Int
   chapterTitle  String
@@ -122,7 +122,7 @@ enum DifficultyLevel {
 
 model Problem {
   id              String          @id @default(cuid()) @map("_id")
-  dsaChapter      DsaChapter      @relation(fields: [dsaChapterId], references: [id])
+  dsaChapter      DsaChapter      @relation(fields: [dsaChapterId], references: [id] ,  onDelete: Cascade)
   dsaChapterId    String
   title           String
   articleLink     String?

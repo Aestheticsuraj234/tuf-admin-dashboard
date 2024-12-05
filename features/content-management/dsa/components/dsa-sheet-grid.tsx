@@ -10,10 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookIcon, BookOpen, CodeIcon, ListIcon } from "lucide-react";
+import { BookIcon, BookOpen, CodeIcon, ListIcon, Trash } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { delete_sheet } from "../actions";
 
 interface DsaSheetGridProps {
   id: string;
@@ -42,10 +44,25 @@ const DsaSheetGrid = ({
     router.push(`/content-management/dsa/${id}`);
   };
 
+  const onDelete = async (id:string)=>{
+    try {
+      const deletedSheet = await delete_sheet(id);
+      console.log(deletedSheet)
+      toast(`${title} is Deleted successfully`)
+    } catch (error) {
+      console.error(error);
+      toast("Something went wrong")
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-col items-start justify-center cursor-pointer">
+        <div className="w-full flex  justify-between items-center flex-row mb-2">
+
         <BookIcon size={40} className="px-2 py-2 border rounded-full" />
+        <Trash onClick={()=>onDelete(id)} size={40} className=" text-red-500 px-2 py-2 border rounded-full"/>
+        </div>
         <CardTitle className="font-extrabold text-xl truncate text-zinc-700 dark:text-zinc-100 flex justify-between items-center w-full">
           {title.toLocaleUpperCase()}
           <Badge variant={status}>{status}</Badge>

@@ -16,6 +16,7 @@ export const DsaChapterSchema = z.object({
     status:z.nativeEnum(ContentStatus)
 })
 
+
 export const DsaStepSchema = z.object({
     stepNumber:z.number().min(1 , {message:"Step number is required"}),
     stepTitle:z.string().min(1 , {message:"Step title is required"}),
@@ -23,6 +24,12 @@ export const DsaStepSchema = z.object({
     status:z.nativeEnum(ContentStatus)
 })
 
+export const UpdateDSAStepSchema = z.object({
+    dsaSteps: z.array(DsaStepSchema).optional(),
+  });
+  
+
+  
 export const DsaContentSchema = z.object({
     title:z.string().min(1 , {message:"Dsa title is required"}),
     description:z.string().min(1,{message:"Descriptiom is required"}),

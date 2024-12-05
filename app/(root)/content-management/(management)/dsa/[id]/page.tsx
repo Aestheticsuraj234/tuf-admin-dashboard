@@ -4,13 +4,24 @@ import { Separator } from "@/components/ui/separator";
 
 import DsaSheetCard from "@/features/content-management/dsa/components/dsa-sheet-card";
 import { db } from "@/lib/db/db";
-import { BookOpenCheck, Brain, Edit, Footprints, Rss } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpenCheck,
+  Brain,
+  Edit,
+  Footprints,
+  Rss,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DsaStepClient } from "@/features/content-management/dsa/components/steps/client";
-import { getDsaChapterData, getDsaProblemData, getDsaStepsBySheetId } from "@/features/content-management/dsa/actions";
+import {
+  getDsaChapterData,
+  getDsaProblemData,
+  getDsaStepsBySheetId,
+} from "@/features/content-management/dsa/actions";
 import { DsaChapterClient } from "@/features/content-management/dsa/components/chapters/client";
 import { DsaProblemClient } from "@/features/content-management/dsa/components/problems/client";
 
@@ -62,7 +73,7 @@ const DsaSheetIdPage = async (props: { params: Promise<{ id: string }> }) => {
 
   const dsaStepData = await getDsaStepsBySheetId(params.id);
   const dsaChaptersData = await getDsaChapterData(params.id);
-  const dsaProblemData = await getDsaProblemData(params.id)
+  const dsaProblemData = await getDsaProblemData(params.id);
 
   return (
     <main className="px-4 py-4 flex flex-col">
@@ -77,19 +88,34 @@ const DsaSheetIdPage = async (props: { params: Promise<{ id: string }> }) => {
           {dsaSheetById?.title.toLocaleUpperCase()}
         </h1>
 
-        <Link href={`/content-management/dsa/${params.id}/edit/dsaSheet`}>
-          <Hint
-            label="Edit DSA Sheet"
-            align="center"
-            side="left"
-            alignOffset={18}
-            sideOffset={18}
-          >
-            <Button variant={"outline"} size={"icon"}>
-              <Edit size={24} className="dark:text-white text-black" />
-            </Button>
-          </Hint>
-        </Link>
+        <div className="flex flex-row items-end justify-center gap-4">
+          <Link href={`/content-management/dsa`}>
+            <Hint
+              label="Back to DSA"
+              align="center"
+              side="left"
+              alignOffset={18}
+              sideOffset={18}
+            >
+              <Button variant={"outline"} size={"icon"}>
+                <ArrowLeft size={24} className="dark:text-white text-black" />
+              </Button>
+            </Hint>
+          </Link>
+          <Link href={`/content-management/dsa/${params.id}/edit/dsaSheet`}>
+            <Hint
+              label="Edit DSA Sheet"
+              align="center"
+              side="left"
+              alignOffset={18}
+              sideOffset={18}
+            >
+              <Button variant={"outline"} size={"icon"}>
+                <Edit size={24} className="dark:text-white text-black" />
+              </Button>
+            </Hint>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mt-10 mx-10">
@@ -116,7 +142,7 @@ const DsaSheetIdPage = async (props: { params: Promise<{ id: string }> }) => {
 
       <section className="w-auto mt-10">
         <Tabs defaultValue={"steps"}>
-          <TabsList >
+          <TabsList>
             <TabsTrigger value="steps">Steps</TabsTrigger>
             <TabsTrigger value="chapters">Chapters</TabsTrigger>
             <TabsTrigger value="problems">Problems</TabsTrigger>
@@ -140,7 +166,7 @@ const DsaSheetIdPage = async (props: { params: Promise<{ id: string }> }) => {
           <TabsContent value="problems">
             <div className="flex-col">
               <div className="flex-1 space-y-4 p-8 pt-6">
-                <DsaProblemClient data={dsaProblemData}/>
+                <DsaProblemClient data={dsaProblemData} />
               </div>
             </div>
           </TabsContent>
