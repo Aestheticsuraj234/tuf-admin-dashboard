@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "sonner";
 import AlertModal from "@/components/shared/modal/alert-modal";
+import { onDeleteProblem } from "../../actions";
 
 
 interface CellActionProps {
@@ -32,18 +33,18 @@ const CellAction: React.FC<CellActionProps> = ({ data }) => {
   };
 
   const onConfirm = async()=>{
-    // try {
-    //     setLoading(true);
-    //     await onDeleteUser(data.id);
-    //     toast("User Deleted🗑️")
-    //     router.refresh()
-    // } catch (error) {
-    //     toast("Something Went Wrong")
-    // }
-    // finally{
-    //     setLoading(false)
-    //     setOpen(false)
-    // }
+    try {
+        setLoading(true);
+        await onDeleteProblem(data.id);
+        toast("Problem Deleted🗑️")
+        router.refresh()
+    } catch (error) {
+        toast("Something Went Wrong")
+    }
+    finally{
+        setLoading(false)
+        setOpen(false)
+    }
   }
 
   return (
@@ -68,7 +69,7 @@ const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <Copy className="mr-2 h-4 w-4" /> Copy Id
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => router.push(`/user-management/edit/${data.id}`)}>
+        <DropdownMenuItem onClick={() => router.push(`/content-management/dsa/${params.id}/edit/problem/${data.id}`)}>
           <Edit className="mr-2 h-4 w-4" /> Update
         </DropdownMenuItem>
 

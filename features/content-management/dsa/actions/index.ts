@@ -1,7 +1,13 @@
 "use server";
 
 import { db } from "@/lib/db/db";
-import { DsaContentSchema, UpdateDSAStepSchema } from "../schema";
+import {
+  DsaChapterSchema,
+  DsaContentSchema,
+  problemSchema,
+  UpdateDsaChapterSchema,
+  UpdateDSAStepSchema,
+} from "../schema";
 import { z } from "zod";
 import { currentUser } from "@/features/auth/actions";
 import { ContentStatus, ContentType, DifficultyLevel } from "@prisma/client";
@@ -787,3 +793,248 @@ export const getStepWithChapterByStepId = async (stepId: string) => {
     })),
   };
 };
+
+export const onDeleteStep = async (stepId:string)=>{
+  const dsaStep= await db.dsaStep.findUnique({
+    where:{
+      id:stepId
+    }
+  })
+
+  if(!dsaStep){
+    throw new Error("Not Found")
+  }
+
+  if(dsaStep){
+    await db.dsaStep.delete({
+      where:{
+        id:stepId
+      }
+    })
+  }
+  revalidatePath("/content-management")
+}
+// * chapters
+
+export const getChapterWithProblemsByChapterId = async (chapterId: string) => {
+  const dsaChapter = await db.dsaChapter.findUnique({
+    where: {
+      id: chapterId,
+    },
+    include: {
+      problems: true,
+    },
+  });
+
+  if (!dsaChapter) {
+    return null;
+  }
+
+  return {
+    chapter: {
+      id: dsaChapter.id,
+      chapterNumber: dsaChapter.chapterNumber,
+      chapterTitle: dsaChapter.chapterTitle,
+      status: dsaChapter.status as ContentStatus,
+      createdAt: dsaChapter.createdAt,
+      updatedAt: dsaChapter.updatedAt,
+    },
+    problems: dsaChapter.problems.map((problem) => ({
+      id: problem.id,
+      problemTitle: problem.title,
+      difficultyLevel: problem.difficultyLevel as DifficultyLevel,
+      youtubeLink: problem.videoLink,
+      problemLink: problem.practiceLink,
+      articleLink: problem.articleLink,
+      status: problem.status as ContentStatus,
+      createdAt: problem.createdAt,
+      updatedAt: problem.updatedAt,
+    })),
+  };
+};
+
+export const UpdateDsaChapterByChapterId = async (
+  
+  chapterId: string,
+  values: z.infer<typeof UpdateDsaChapterSchema>
+) => {
+  const user = await currentUser();
+
+  if (user?.role !== "ADMIN") {
+    throw new Error("You ar not an admin");
+  }
+
+  const { chapterTitle, status, problems } = values;
+
+  const existingChapter = await db.dsaChapter.findUnique({
+    where: {
+      id: chapterId,
+    },
+    include: {
+      problems: true,
+    },
+  });
+
+  if(!existingChapter){
+    throw new Error("chapter not found.")
+  }
+
+  const updatedChapter = await db.dsaChapter.update({
+    where:{
+      id:chapterId
+    },
+    data:{
+      chapterTitle:chapterTitle,
+      status:status
+    }
+  })
+
+  for(const problemData of problems || []){
+    const existingProblem = existingChapter.problems.find(
+      (problem)=>problem.title === problemData.problemTitle
+    );
+
+    if(existingProblem){
+      await db.problem.update({
+        where:{
+         id: existingProblem.id
+        },
+        data:{
+          title:problemData.problemTitle,
+          status:problemData.status,
+          videoLink:problemData.youtubeLink,
+          articleLink:problemData.articleLink,
+          practiceLink:problemData.problemLink,
+          difficultyLevel:problemData.difficultyLevel as DifficultyLevel
+        }
+      })
+    }
+    else{
+      // create new Problem
+      await db.problem.create({
+        // @ts-ignore
+        data:{
+          title: problemData.problemTitle, // Map problemTitle to title
+          status: problemData.status,
+          videoLink: problemData.youtubeLink,
+          articleLink: problemData.articleLink,
+          practiceLink: problemData.problemLink,
+          difficultyLevel: problemData.difficultyLevel as DifficultyLevel,
+          dsaChapterId: existingChapter.id,
+        }
+      })
+    }
+  }
+
+  // remove problems not in the update
+  const updatedProblemTitles = (problems || []).map((p)=>p.problemTitle);
+  for(const existingProblem of existingChapter.problems){
+    if(!updatedProblemTitles.includes(existingProblem.title)){
+      await db.problem.delete({
+        where:{
+          id:existingProblem.id
+        }
+      })
+    }
+  }
+return updatedChapter
+};
+
+
+export const onDeleteChapter =async(chapterId:string)=>{
+  const chapter= await db.dsaChapter.findUnique({
+    where:{
+      id:chapterId
+    }
+  })
+
+  if(!chapter){
+    throw new Error("Not Found")
+  }
+
+  if(chapter){
+    await db.dsaChapter.delete({
+      where:{
+        id:chapterId
+      }
+    })
+  }
+  revalidatePath("/content-management")
+}
+
+// *Problems
+
+export const getProblemById = async(problemId:string)=>{
+  const problem = await db.problem.findUnique({
+    where: {
+      id: problemId,
+    },
+  });
+
+  if (!problem) {
+    return null;
+  }
+
+  return {
+    id: problem.id,
+    problemTitle: problem.title,
+    difficultyLevel: problem.difficultyLevel as DifficultyLevel,
+    youtubeLink: problem.videoLink,
+    problemLink: problem.practiceLink,
+    articleLink: problem.articleLink,
+    status: problem.status as ContentStatus,
+    createdAt: problem.createdAt,
+    updatedAt: problem.updatedAt,
+  }
+
+ 
+}
+
+export const UpdateDsaProblemByProblemId = async(problemId:string , values:z.infer<typeof problemSchema>)=>{
+  const problem= await db.problem.findUnique({
+    where:{
+      id:problemId
+    }
+  })
+
+  if(!problem){
+    return null
+  }
+
+  const updatedProblem = await db.problem.update({
+    where: {
+      id: problemId,
+    },
+    data: {
+      title: values.problemTitle,
+      difficultyLevel: values.difficultyLevel,
+      status: values.status,
+      videoLink: values.youtubeLink,
+      practiceLink: values.problemLink,
+      articleLink: values.articleLink,
+    },
+  });
+
+  return updatedProblem;
+}
+
+export const onDeleteProblem = async (problemId:string)=>{
+  const problem= await db.problem.findUnique({
+    where:{
+      id:problemId
+    }
+  })
+
+  if(!problem){
+    throw new Error("Not Found")
+  }
+
+  if(problem){
+    await db.problem.delete({
+      where:{
+        id:problemId
+      }
+    })
+  }
+  revalidatePath("/content-management")
+}

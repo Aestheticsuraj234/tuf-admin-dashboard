@@ -10,6 +10,7 @@ import CellAction from "./cell-action";
 import Link from "next/link";
 
 export interface ProblemColumn {
+  id:string
   FromChapterNo: number;
   ChapterTitle: string;
   problemTitle: string;
