@@ -75,3 +75,35 @@ export const create_blog = async (values: z.infer<typeof AddBlogSchema>) => {
     data:newBlog
   }
 };
+
+export const delete_blog = async (id:string)=>{
+  const user = await currentUser();
+
+  if (user?.role !== "ADMIN") {
+    throw new Error("You are not an admin");
+  }
+
+const existingBlog = await db.blog.findUnique({
+  where:{
+    id:id
+  }
+})
+
+if(!existingBlog){
+  throw new Error("Blog not found")
+}
+
+await db.blog.delete({
+  where:{
+    id:id
+  }
+})
+
+revalidatePath("/content-management/blogs" , "page")
+
+return {
+  success:true ,
+  message:"Blog deleted successfully✅"
+}
+
+}
