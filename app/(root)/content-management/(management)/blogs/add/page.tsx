@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import EditorJS from "@editorjs/editorjs";
 import Editor from "@/features/content-management/blog/components/editor";
+import { create_blog } from "@/features/content-management/blog/actions";
 
 const BlogAddPage = () => {
   const [isPending, setIsPending] = useState(false);
@@ -48,7 +49,7 @@ const BlogAddPage = () => {
         const outputData = await editorRef.current.save();
         values.blogContent = JSON.stringify(outputData);
       }
-      //  const response = await create_blog(values)
+       const response = await create_blog(values)
       toast("Blog Created succcessfully");
       methods.reset();
       editorRef.current?.clear();

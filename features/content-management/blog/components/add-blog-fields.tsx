@@ -28,17 +28,15 @@ const AddBlogFields = () => {
   const [isLoading, setIsLoading] = useState(false);
   const blogType = watch("blogType");
 
-  const handleTitleChange = (event:any)=>{
+  const handleTitleChange = (event: any) => {
     const newTitle = event.target.value;
     setIsLoading(true);
-    setValue("title" , newTitle);
-    setTimeout(()=>{
-        setValue("slug" , slugify(newTitle))
-        setIsLoading(false)
-    },1000)
-  
-
-  }
+    setValue("title", newTitle);
+    setTimeout(() => {
+      setValue("slug", slugify(newTitle));
+      setIsLoading(false);
+    }, 1000);
+  };
 
   return (
     <div>
@@ -69,7 +67,12 @@ const AddBlogFields = () => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Title of Blog" {...field}  value={field.value} onChange={(e)=>handleTitleChange(e)}/>
+                <Input
+                  placeholder="Title of Blog"
+                  {...field}
+                  value={field.value}
+                  onChange={(e) => handleTitleChange(e)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,7 +103,7 @@ const AddBlogFields = () => {
                   <Input placeholder="Slug of Blog:" {...field} readOnly />
                   {isLoading && (
                     <ClipLoader
-                color="#ef4444"
+                      color="#ef4444"
                       size={15}
                       className="absolute top-1/2 transform -translate-y-1/2 right-3 "
                     />
@@ -111,8 +114,6 @@ const AddBlogFields = () => {
             </FormItem>
           )}
         />
-
-     
 
         <FormField
           control={control}
@@ -171,10 +172,9 @@ const AddBlogFields = () => {
           )}
         />
 
-<div className="mt-4">
-          {
-            blogType === BlogType.EXISTING && (
-              <FormField
+        <div className="mt-4">
+          {blogType === BlogType.EXISTING && (
+            <FormField
               control={control}
               name="blogUrl"
               render={({ field }) => (
@@ -187,10 +187,8 @@ const AddBlogFields = () => {
                 </FormItem>
               )}
             />
-            )
-          }
-</div>
-
+          )}
+        </div>
       </div>
     </div>
   );
