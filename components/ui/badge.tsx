@@ -23,7 +23,8 @@ const badgeVariants = cva(
         ARCHIVED:"bg-[#ff0000] text-[#fff]",
         EASY:"bg-[#03dc7a] text-[#fff]",
         MEDIUM:"border-transparent bg-yellow-600 text-white hover:bg-yellow-600/40",
-        HARD:"bg-[#ff0000] text-[#fff]"
+        HARD:"bg-[#ff0000] text-[#fff]",
+        PREMIUM:"bg-indigo-500 text-white"
       },
     },
     defaultVariants: {

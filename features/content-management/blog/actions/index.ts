@@ -1,7 +1,7 @@
 "use server";
 
 import { date, z } from "zod";
-import { AddBlogSchema } from "../schema";
+import { AddBlogSchema, UpdateBlogSchema } from "../schema";
 import { currentUser } from "@/features/auth/actions";
 import { db } from "@/lib/db/db";
 import { BlogType, ContentType } from "@prisma/client";
@@ -106,4 +106,84 @@ return {
   message:"Blog deleted successfully✅"
 }
 
+}
+
+
+export const getBlogByBolgId = async (id:string)=>{
+  const blog =await db.blog.findUnique({
+    where:{
+      id:id
+    }
+  })
+  if(!blog){
+    throw new Error("Blog not found");
+  }
+
+  return blog;
+}
+
+
+export const update_blog = async (values:z.infer<typeof UpdateBlogSchema> , id:string)=>{
+  const user = await currentUser();
+
+  if (user?.role !== "ADMIN") {
+    throw new Error("You are not an admin");
+  }
+
+  const blog =await db.blog.findUnique({
+    where:{
+      id:id
+    }
+  })
+  if(!blog){
+    throw new Error("Blog not found");
+  }
+
+  let updatedBlog;
+  switch (blog.blogType) {
+    case BlogType.EXISTING:
+      updatedBlog = await db.blog.update({
+        where:{
+          id:id
+        },
+        data: {
+        
+          title: values.title,
+          description: values.description,
+          thumnail: values.thumbnail,
+          slug: values.slug,
+          status: values.status,
+         
+          blogUrl: values.blogUrl,
+        },
+      });
+      break;
+    case BlogType.NEW:
+     
+      updatedBlog = await db.blog.update({
+        where:{
+            id:id
+        },
+        data: {
+        
+          title: values.title,
+          description: values.description,
+          thumnail: values.thumbnail,
+          slug: values.slug,
+          status: values.status,
+          readTime: calculateReadTime(values.blogContent).toString(),
+          
+          blogContent: values.blogContent,
+        },
+      });
+      break;
+      default:
+        throw new Error("Invalid blog type")
+  }
+  revalidatePath("/content-management/blogs" , "page")
+  return{
+    success:true,
+    message:"Blog Created successfully",
+    data:updatedBlog
+  }
 }

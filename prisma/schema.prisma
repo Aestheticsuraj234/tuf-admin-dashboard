@@ -26,14 +26,14 @@ model User {
   problemMarked ProblemMarked[]
   problemNotes  Note[]
 
-  blogLikedBy  BlogLikedBy[]
-  blogSavedBy  BlogSavedBy[]
+  blogLikedBy   BlogLikedBy[]
+  blogSavedBy   BlogSavedBy[]
   blogVisitedBy BlogVisitedBy[]
   blogComments  BlogComment[]
-  
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  subscribedTo  Subscription?
 }
 
 model Account {
@@ -86,76 +86,73 @@ model Content {
 }
 
 enum BlogType {
-NEW
-EXISTING
+  NEW
+  EXISTING
 }
 
 model Blog {
-  id        String  @id @default(cuid()) @map("_id")
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  contentId String
-  title     String
-  slug     String?  @unique
+  id          String          @id @default(cuid()) @map("_id")
+  content     Content         @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId   String
+  title       String
+  slug        String?         @unique
   description String
-  readTime   String?
+  readTime    String?
   thumnail    String
-  blogContent  String?
+  blogContent String?
   blogType    BlogType
-  blogUrl    String?
-  likedBy   BlogLikedBy[]
-  savedBy   BlogSavedBy[]
-  visitedBy BlogVisitedBy[]
-  commentedBy  BlogComment[]
-  status  ContentStatus  @default(UNPUBLISHED)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime  @updatedAt
-
+  blogUrl     String?
+  likedBy     BlogLikedBy[]
+  savedBy     BlogSavedBy[]
+  visitedBy   BlogVisitedBy[]
+  commentedBy BlogComment[]
+  status      ContentStatus   @default(UNPUBLISHED)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
-model BlogComment{
-  id        String  @id @default(cuid()) @map("_id")
-  userId   String
-  blogId   String
-  comment  String
-  user User @relation(fields: [userId] , references: [id] , onDelete:Cascade)
-  blog Blog @relation(fields: [blogId] , references: [id] , onDelete:Cascade)
-    createdAt  DateTime   @default(now())
-  updatedAt  DateTime  @updatedAt
-
+model BlogComment {
+  id        String   @id @default(cuid()) @map("_id")
+  userId    String
+  blogId    String
+  comment   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model BlogLikedBy{
-   id        String  @id @default(cuid()) @map("_id")
-  userId   String
-  blogId   String
-  isLiked   Boolean
- user User @relation(fields: [userId] , references: [id] , onDelete:Cascade)
-  blog Blog @relation(fields: [blogId] , references: [id] , onDelete:Cascade)
+model BlogLikedBy {
+  id      String  @id @default(cuid()) @map("_id")
+  userId  String
+  blogId  String
+  isLiked Boolean
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog    Blog    @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
-  @@unique([userId , blogId])
+  @@unique([userId, blogId])
 }
 
-model BlogSavedBy{
-   id        String  @id @default(cuid()) @map("_id")
-  userId   String
-  blogId   String
-  isSaved   Boolean
- user User @relation(fields: [userId] , references: [id] , onDelete:Cascade)
-  blog Blog @relation(fields: [blogId] , references: [id] , onDelete:Cascade)
+model BlogSavedBy {
+  id      String  @id @default(cuid()) @map("_id")
+  userId  String
+  blogId  String
+  isSaved Boolean
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog    Blog    @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
-  @@unique([userId , blogId])
+  @@unique([userId, blogId])
 }
 
+model BlogVisitedBy {
+  id          String  @id @default(cuid()) @map("_id")
+  userId      String
+  blogId      String
+  isVisitedBy Boolean
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog        Blog    @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
-model BlogVisitedBy{
-   id        String  @id @default(cuid()) @map("_id")
-  userId   String
-  blogId   String
-  isVisitedBy  Boolean
- user User @relation(fields: [userId] , references: [id] , onDelete:Cascade)
-  blog Blog @relation(fields: [blogId] , references: [id] , onDelete:Cascade)
-
-  @@unique([userId , blogId])
+  @@unique([userId, blogId])
 }
 
 model Dsa {
@@ -248,4 +245,27 @@ model Note {
   problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
+}
+
+model Subscription {
+  id     String @id @default(cuid()) @map("_id")
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan  PLAN
+  status  SubscriptionStatus  @default(ACTIVE)
+  startDate  DateTime  @default(now() )
+  endDate  DateTime?
+
+  @@unique([userId])
+
+}
+
+
+enum PLAN {
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+   ACTIVE
+  INACTIVE
 }
